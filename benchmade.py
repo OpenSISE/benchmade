@@ -31,7 +31,6 @@ def breathe(sock, mac_address, ip, session, index):
             status = struct.unpack('B' * len(breathe_ret), breathe_ret)
             if status[20] == 0:
                 sock.close()
-                sys.stdout.flush()
                 main()
             index += 3
             try:
@@ -105,11 +104,10 @@ def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('0.0.0.0', 3848))
     sock.settimeout(10)
-    sys.stdout.write('\rCtrl + C to quit')
+    print 'Ctrl + C to quit'
     upnet_packet = generate_upnet(mac_address, ip, username, password)    
     session = upnet(sock, upnet_packet)
     breathe(sock, mac_address, ip, session, index)
-    
     
 if __name__ == '__main__':
     main()
