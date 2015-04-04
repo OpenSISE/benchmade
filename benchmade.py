@@ -26,7 +26,7 @@ def breathe(sock, mac_address, ip, session, index):
         try:
             breathe_ret = sock.recv(4096)
         except socket.timeout:
-            time.sleep(20)
+            continue
         else:
             status = struct.unpack('B' * len(breathe_ret), breathe_ret)
             if status[20] == 0:
