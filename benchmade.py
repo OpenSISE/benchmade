@@ -73,7 +73,8 @@ def generate_upnet(mac, ip, user, pwd):
     packet = ''.join([struct.pack('B', i) for i in packet])
     return packet
     
-def generate_breathe(mac, ip, session, index):    
+def generate_breathe(mac, ip, session, index):
+    index = hex(index)[2:]
     packet = []
     packet.append(3)
     packet_len = len(session) + 88
@@ -87,7 +88,7 @@ def generate_breathe(mac, ip, session, index):
     packet.extend([7, 8])
     packet.extend([int(i, 16) for i in mac.split('-')])
     packet.extend([20, 6])
-    packet.extend([int(str(index)[0]), int(str(index)[1:3]), int(str(index)[3:5]), int(str(index)[5:])])
+    packet.extend([int(index[0:-6],16), int(index[-6:-4],16), int(index[-4:-2],16), int(index[-2:],16)])
     packet.extend([42, 6, 0, 0, 0, 0, 43, 6, 0, 0, 0, 0, 44, 6, 0, 0, 0, 0, 45, 6, 0, 0, 0, 0, 46, 6, 0, 0, 0, 0, 47, 6, 0, 0, 0, 0])
     md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
@@ -100,7 +101,7 @@ def main():
     ip = '172.16.X.X'
     username = ''
     password = ''
-    index = 1000000
+    index = 0x01000000
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('0.0.0.0', 3848))
     sock.settimeout(10)
