@@ -14,8 +14,13 @@ def upnet(sock, packet):
     upnet_ret = sock.recv(4096)
     upnet_ret = [i for i in struct.unpack('B' * len(upnet_ret), upnet_ret)]
     decrypt(upnet_ret)
-    session_len = upnet_ret[22] + 23
-    session = upnet_ret[23:session_len]
+    session_len = upnet_ret[22]
+    session = upnet_ret[23:session_len + 23]
+    message_len = upnet_ret[session_len + 30]
+    message = upnet_ret[session_len + 31:message_len + session_len + 31]
+    message = ''.join([struct.pack('B', i) for i in message]).decode('gbk')
+    print message
+    print 'Ctrl + C to quit'
     return session
     
 def breathe(sock, mac_address, ip, session, index):
@@ -103,9 +108,7 @@ def main():
     password = ''
     index = 0x01000000
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(('0.0.0.0', 3848))
     sock.settimeout(10)
-    print 'Ctrl + C to quit'
     upnet_packet = generate_upnet(mac_address, ip, username, password)    
     session = upnet(sock, upnet_packet)
     breathe(sock, mac_address, ip, session, index)
