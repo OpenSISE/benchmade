@@ -10,7 +10,7 @@ password = '' #密码
 ```
 
 ###测试环境
-* Windows、Kali Linux、OpenWRT
+* Windows、Linux、Android、OpenWRT
 * Python 2.7.x
 
 ###参考
