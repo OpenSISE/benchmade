@@ -5,7 +5,11 @@
 import sys
 import socket
 import struct
-import urllib2
+try:
+    # it works on python2.x only
+    import urllib2
+except:
+    import urllib
 import time
 import hashlib
 
@@ -18,9 +22,9 @@ def upnet(sock, packet):
     session = upnet_ret[23:session_len + 23]
     message_len = upnet_ret[session_len + 30]
     message = upnet_ret[session_len + 31:message_len + session_len + 31]
-    message = ''.join([struct.pack('B', i) for i in message]).decode('gbk')
-    print message
-    print 'Ctrl + C to quit'
+    message = b''.join([struct.pack('B', i) for i in message]).decode('gbk')
+    print(message)
+    print('Ctrl + C to quit')
     return session
     
 def breathe(sock, mac_address, ip, session, index):
@@ -72,10 +76,12 @@ def generate_upnet(mac, ip, user, pwd):
     packet.extend([9, len(ip) + 2])
     packet.extend([ord(i) for i in ip])
     packet.extend([10, 10, 105, 110, 116, 101, 114, 110, 101, 116, 14, 3, 0, 31, 7, 51, 46, 54, 46, 53])
-    md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
+    
+    md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
+    
     encrypt(packet)
-    packet = ''.join([struct.pack('B', i) for i in packet])
+    packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
     
 def generate_breathe(mac, ip, session, index):
@@ -95,10 +101,10 @@ def generate_breathe(mac, ip, session, index):
     packet.extend([20, 6])
     packet.extend([int(index[0:-6],16), int(index[-6:-4],16), int(index[-4:-2],16), int(index[-2:],16)])
     packet.extend([42, 6, 0, 0, 0, 0, 43, 6, 0, 0, 0, 0, 44, 6, 0, 0, 0, 0, 45, 6, 0, 0, 0, 0, 46, 6, 0, 0, 0, 0, 47, 6, 0, 0, 0, 0])
-    md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
+    md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
     encrypt(packet)
-    packet = ''.join([struct.pack('B', i) for i in packet])
+    packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
     
 def main(username,password):
@@ -114,7 +120,7 @@ def main(username,password):
 if __name__ == '__main__':
     argc = len(sys.argv)
     if argc !=3:
-        print sys.argv[0],"\n"
-        print 'please enter your username&password'
+        print(sys.argv[0],"\n")
+        print('please provide your username and password')
         exit(0)
     main(sys.argv[1], sys.argv[2])
